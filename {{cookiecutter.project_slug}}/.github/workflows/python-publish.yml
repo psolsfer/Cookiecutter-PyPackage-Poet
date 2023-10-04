@@ -1,0 +1,63 @@
+{% raw %}
+# This workflow will upload a Python Package using Twine when a release or a tag is created
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
+
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Upload Python Package
+
+on:
+  release:
+    types: [published]
+
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+env:
+    PYTHON_VERSION: "3.11"
+
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    - name: Install Poetry
+      run: |
+          pip install --no-input poetry
+    - name: Install dependencies
+      run: |
+          poetry install --with dev
+    - name: Run style checks
+      run: |
+          poetry run invoke lint
+          poetry run invoke type-check
+    - name: Build package
+      run: |
+          poetry build
+          {% endraw %}{%- if cookiecutter.private_package_repository_name %}{% raw %}
+    - name: Publish package
+      run: |
+        poetry config repositories.private "{% endraw %}{{ cookiecutter.private_package_repository_url.replace('simple/', '').replace('simple', '') }}{% raw %}"
+        poetry config http-basic.private "${{ secrets.POETRY_HTTP_BASIC_PRIVATE_USERNAME }}" "${{ secrets.POETRY_HTTP_BASIC_PRIVATE_PASSWORD }}"
+        poetry publish --build --repository private
+    {% endraw %}{%- else %}{% raw %}
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+    {% endraw %}{%- endif %}
