@@ -16,7 +16,6 @@ keywords = [
     "black",
     "template",
     "packages",
-    "makefile",
     "poetry",
     "codestyle",
     "formatters",
