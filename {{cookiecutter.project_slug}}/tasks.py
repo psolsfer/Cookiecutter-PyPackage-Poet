@@ -72,7 +72,7 @@ def format_ruff(c: Context, check: bool = True, ignore_failure: bool = False) ->
 
 
 @task(help={"check": "Only checks, without making changes"})
-def lint(c:Context, check=True)->None:
+def lint(c:Context, check:bool=True)->None:
     """Run all linting/formatting"""
     lint_ruff(c, check, True)
     {%- if cookiecutter.formatter|lower == 'black' %}
@@ -85,7 +85,7 @@ def lint(c:Context, check=True)->None:
 
 # Tests
 @task(help={"tox_env": "Environment name to run the test"})
-def test(c:Context, tox_env="py311")->None:
+def test(c:Context, tox_env:str="py311")->None:
     """Run tests with tox"""
     _run(c, f"tox -e {tox_env}")
 
@@ -103,7 +103,7 @@ def test_all(c:Context)->None:
 
 
 @task(help={"publish": "Publish the result via coveralls"})
-def coverage(c:Context, publish=False)->None:
+def coverage(c:Context, publish:bool=False)->None:
     """Run tests and generate a coverage report."""
     {%- if cookiecutter.use_pytest == 'y' %}
     _run(c, "coverage run --source {} -m pytest".format(SOURCE_DIR))
@@ -140,7 +140,7 @@ def lab(c:Context)->None:
 
 # Documentation
 @task(help={"launch": "Launch documentation in the web browser"})
-def docs(c:Context, launch=True)->None:
+def docs(c:Context, launch:bool=True)->None:
     """Generate documentation"""
     # Remove old documentation files
     clean_docs(c)
