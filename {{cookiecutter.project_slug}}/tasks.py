@@ -57,7 +57,7 @@ def lint_ruff(c: Context, check: bool = True, ignore_failure: bool = False) -> N
 
 @task(help={"check": "Only checks without making changes"})
 def format_black(c:Context, check=True, ignore_failure: bool = False)->None:
-    """Check style with black"""
+    """Check style with black."""
     check_str = "--check" if check else ""
     _run(c, "black --check {} {}".format(check_str, " ".join(PYTHON_DIRS)), ignore_failure)
 {% elif cookiecutter.formatter|lower == 'ruff-format' %}
@@ -73,7 +73,7 @@ def format_ruff(c: Context, check: bool = True, ignore_failure: bool = False) ->
 
 @task(help={"check": "Only checks, without making changes"})
 def lint(c:Context, check:bool=True)->None:
-    """Run all linting/formatting"""
+    """Run all linting/formatting."""
     lint_ruff(c, check, True)
     {%- if cookiecutter.formatter|lower == 'black' %}
     format_black(c, check, True)
@@ -86,19 +86,19 @@ def lint(c:Context, check:bool=True)->None:
 # Tests
 @task(help={"tox_env": "Environment name to run the test"})
 def test(c:Context, tox_env:str="py311")->None:
-    """Run tests with tox"""
+    """Run tests with tox."""
     _run(c, f"tox -e {tox_env}")
 
 
 @task
 def test_pytest(c:Context)->None:
-    """Run tests quickly with the default Python"""
+    """Run tests quickly with the default Python."""
     _run(c, "pytest")
 
 
 @task
 def test_all(c:Context)->None:
-    """Run tests on every Python version with tox"""
+    """Run tests on every Python version with tox."""
     _run(c, "tox")
 
 
@@ -123,7 +123,7 @@ def coverage(c:Context, publish:bool=False)->None:
 
 @task
 def safety(c:Context)->None:
-    """Checks safety of the dependencies"""
+    """Checks safety of the dependencies."""
     _run(c, "safety check --continue-on-error --full-report")
 {%- endif %}
 {%- if cookiecutter.with_jupyter_lab == "y" %}
@@ -132,7 +132,7 @@ def safety(c:Context)->None:
 # Jupyter lab
 @task
 def lab(c:Context)->None:
-    """Run Jupyter lab"""
+    """Run Jupyter lab."""
     _run(c, "mkdir -p notebooks")
     _run(c, "jupyter lab --allow-root --notebook-dir notebooks")
 {%- endif %}
@@ -141,7 +141,7 @@ def lab(c:Context)->None:
 # Documentation
 @task(help={"launch": "Launch documentation in the web browser"})
 def docs(c:Context, launch:bool=True)->None:
-    """Generate documentation"""
+    """Generate documentation."""
     # Remove old documentation files
     clean_docs(c)
     # Generate documentation
@@ -152,20 +152,20 @@ def docs(c:Context, launch:bool=True)->None:
 
 @task
 def deploy_docs(c:Context)->None:
-    """Deploy documentation"""
+    """Deploy documentation."""
     _run(c, "mkdocs gh-deploy")
 
 
 @task
 def servedocs(c:Context)->None:
-    """Serve the docs with live reloading"""
+    """Serve the docs with live reloading."""
     _run(c, "mkdocs serve")
 
 
 # Clean
 @task
 def clean_build(c:Context)->None:
-    """Clean up files from package building"""
+    """Clean up files from package building."""
     for dirpath in ["build", "dist", ".eggs"]:
         shutil.rmtree(dirpath, ignore_errors=True)
     for pattern in ["*.egg-info", "*.egg"]:
@@ -178,7 +178,7 @@ def clean_build(c:Context)->None:
 
 @task
 def clean_python(c:Context)->None:
-    """Clean up python file artifacts"""
+    """Clean up python file artifacts."""
     for pattern in ["*.pyc", "*.pyo", "*~", "__pycache__"]:
         for filename in Path('.').glob('**/' + pattern):
             try:
@@ -192,7 +192,7 @@ def clean_python(c:Context)->None:
 
 @task
 def clean_tests(c:Context)->None:
-    """Clean up files from testing"""
+    """Clean up files from testing."""
     _delete_file(COVERAGE_FILE)
     shutil.rmtree(TOX_DIR, ignore_errors=True)
     shutil.rmtree(COVERAGE_DIR, ignore_errors=True)
@@ -200,13 +200,13 @@ def clean_tests(c:Context)->None:
 
 @task
 def clean_docs(c:Context)->None:
-    """Clean up files from documentation builds"""
+    """Clean up files from documentation builds."""
     shutil.rmtree(DOCS_BUILD_DIR, ignore_errors=True)
 
 
 @task(pre=[clean_build, clean_python, clean_tests, clean_docs])
 def clean(c:Context)->None:
-    """Runs all clean sub-tasks"""
+    """Runs all clean sub-tasks."""
     pass
 
 
@@ -220,38 +220,38 @@ def pre_release_check(c: Context) -> None:
 
 @task(clean)
 def dist(c:Context)->None:
-    """Build source and wheel packages"""
+    """Build source and wheel packages."""
     _run(c, "poetry build")
 
 
 @task(dist)
 def release(c:Context)->None:
-    """Make a release of the python package to pypi"""
+    """Make a release of the python package to pypi."""
     _run(c, "poetry publish")
 
 
 # Package installation
 @task(clean)
 def install_package(c:Context)->None:
-    """Install the package to the active Python's site-packages"""
+    """Install the package to the active Python's site-packages."""
     _run(c, "poetry install")
 
 
 @task
 def pre_commit_install(c:Context)->None:
-    """Install pre-commit hooks"""
+    """Install pre-commit hooks."""
     _run(c, "pre-commit install")
 
 
 @task(pre=[install_package, pre_commit_install])
 def install(c:Context)->None:
-    """Install the package and the pre-commit hooks"""
+    """Install the package and the pre-commit hooks."""
 
 
 # Poetry
 @task
 def install_poetry(c:Context)->None:
-    """Download and install Poetry"""
+    """Download and install Poetry."""
     if os.name == 'nt':  # Windows
         c.run("(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -")
     else:  # Unix/Linux/MacOS
@@ -260,7 +260,7 @@ def install_poetry(c:Context)->None:
 
 @task
 def remove_poetry(c:Context)->None:
-    """Uninstall Poetry"""
+    """Uninstall Poetry."""
     if os.name == 'nt':  # Windows
         c.run("(Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -UseBasicParsing).Content | py - --uninstall")
     else:  # Unix/Linux/MacOS
