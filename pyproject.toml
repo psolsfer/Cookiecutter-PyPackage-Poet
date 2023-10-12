@@ -63,7 +63,7 @@ watchdog = ">=3.0.0"
 tox = ">=4.11"
 tox-gh-actions = "^3"
 mkdocs = ">=1.5.3"
-mkdocstrings = ">=0.23.0"
+mkdocstrings = { extras = ["python"], version = ">=0.23.0" }
 mkdocs-material = ">=9.4.2"
 mkdocs-material-extensions = ">=1.2"
 mkdocs-include-markdown-plugin = ">=6.0"
@@ -99,7 +99,7 @@ optional = true
 
 [tool.poetry.group.docs.dependencies]
 mkdocs = ">=1.5.3"
-mkdocstrings = ">=0.23.0"
+mkdocstrings = { extras = ["python"], version = ">=0.23.0" }
 mkdocs-material = ">=9.4.2"
 mkdocs-material-extensions = ">=1.2"
 mkdocs-include-markdown-plugin = ">=6.0"

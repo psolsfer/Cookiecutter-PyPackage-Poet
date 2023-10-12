@@ -106,9 +106,9 @@ def test_all(c:Context)->None:
 def coverage(c:Context, publish:bool=False)->None:
     """Run tests and generate a coverage report."""
     {%- if cookiecutter.use_pytest == 'y' %}
-    _run(c, "coverage run --source {} -m pytest".format(SOURCE_DIR))
+    _run(c, f"coverage run --source {SOURCE_DIR} -m pytest")
     {%- else %}
-    _run(c, "coverage run --source {} poetry run pytest".format(SOURCE_DIR))
+    _run(c, f"coverage run --source {SOURCE_DIR} poetry run pytest")
     {%- endif %}
     _run(c, "coverage report")
     if publish:
@@ -123,7 +123,7 @@ def coverage(c:Context, publish:bool=False)->None:
 
 @task
 def safety(c:Context)->None:
-    """Checks safety of the dependencies."""
+    """Check safety of the dependencies."""
     _run(c, "safety check --continue-on-error --full-report")
 {%- endif %}
 {%- if cookiecutter.with_jupyter_lab == "y" %}
@@ -169,7 +169,7 @@ def clean_build(c:Context)->None:
     for dirpath in ["build", "dist", ".eggs"]:
         shutil.rmtree(dirpath, ignore_errors=True)
     for pattern in ["*.egg-info", "*.egg"]:
-        for filename in Path('.').glob('**/' + pattern):
+        for filename in Path().glob('**/' + pattern):
             if filename.is_dir():
                 shutil.rmtree(filename, ignore_errors=True)
             else:
@@ -180,7 +180,7 @@ def clean_build(c:Context)->None:
 def clean_python(c:Context)->None:
     """Clean up python file artifacts."""
     for pattern in ["*.pyc", "*.pyo", "*~", "__pycache__"]:
-        for filename in Path('.').glob('**/' + pattern):
+        for filename in Path().glob('**/' + pattern):
             try:
                 if filename.is_file():
                     filename.unlink(missing_ok=True)
@@ -206,8 +206,8 @@ def clean_docs(c:Context)->None:
 
 @task(pre=[clean_build, clean_python, clean_tests, clean_docs])
 def clean(c:Context)->None:
-    """Runs all clean sub-tasks."""
-    pass
+    """Run all clean sub-tasks."""
+
 
 
 # Build and release
