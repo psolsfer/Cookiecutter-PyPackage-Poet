@@ -154,7 +154,7 @@ You'll need a ssh key to push the repo. You can [generate] a key or [add] an exi
 
 Log into your account at [Read the Docs]. If you don't have one, create one and log into it.
 
-If you are not at your dashboard, choose the pull-down next to your username in the upper right, and select "My Projects". Choose the button to Import the repository and follow the directions.
+If you are not at your dashboard, choose the pull-down next to your username in the upper right, and select "My Projects". Choose the button to import the repository and follow the directions.
 
 Now your documentation will get rebuilt when you make documentation changes to your package.
 

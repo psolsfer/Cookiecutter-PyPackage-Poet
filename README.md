@@ -7,7 +7,8 @@
 | **Docs** | [![Documentation Status](<https://readthedocs.org/projects/cookiecutter-pypackage-poet/badge/?version=latest> 'Documentation Status')](https://cookiecutter-pypackage-poet.readthedocs.io/en/latest/) |
 | **GitHub** | [![Cookiecutter PyPackage Poet project](https://img.shields.io/badge/GitHub-Cookiecutter%20PyPackage%20Poet-blue.svg)](<https://github.com/psolsfer/cookiecutter-pypackage-poet>) [![Forks](https://img.shields.io/github/forks/psolsfer/cookiecutter-pypackage-poet.svg)](<https://github.com/psolsfer/cookiecutter-pypackage-poet>) [![Stars](https://img.shields.io/github/stars/psolsfer/cookiecutter-pypackage-poet.svg)](<https://github.com/psolsfer/cookiecutter-pypackage-poet>) [![Issues](https://img.shields.io/github/issues/psolsfer/cookiecutter-pypackage-poet.svg)](<https://github.com/psolsfer/cookiecutter-pypackage-poet>)
 | **Code style** | [![linting - Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff) [![code style - Ruff formatter](https://img.shields.io/badge/Ruff%20Formatter-checked-blue.svg)](https://github.com/astral-sh/ruff) [![types - Mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
-| **License** | [![License - BSD-3-Clause](<https://img.shields.io/pypi/l/cookiecutter-pypackage-poet.svg>)](<https://spdx.org/licenses/BSD-3-Clause.html>) |
+| **License** | [![License - BSD-3-Clause](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](<https://spdx.org/licenses/BSD-3-Clause.html>) |
+
 
 [Cookiecutter] / [Cruft] template for a Python package, based on [audreyfeldroy]
 and [radix-ai] Cookiecutter packages.

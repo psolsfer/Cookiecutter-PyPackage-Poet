@@ -2,7 +2,7 @@
 
 ----
 
-Optionally, your package can include a console script using Click, Typer or argparse (Python 3.2+).
+Optionally, your package can include a console script using Click, Typer or argparse.
 
 ## How It Works
 
