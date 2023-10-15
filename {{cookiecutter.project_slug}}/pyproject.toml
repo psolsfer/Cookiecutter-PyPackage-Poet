@@ -107,7 +107,7 @@ mkdocs-material = ">=9.4.2"
 mkdocs-material-extensions = ">=1.2"
 mkdocs-include-markdown-plugin = ">=6.0"
 mkdocs-awesome-pages-plugin = ">=2.9.2"
-mypy = ">=1.5.0"
+mypy = ">=1.6.0"
 {%- if cookiecutter.use_pytest == 'y' %}
 pytest = { extras = ["toml"], version = ">=7.4.2" }
 pytest-cov = ">=4.1.0"
@@ -134,7 +134,7 @@ black = ">=23.9.0"
 {%- endif %}
 commitizen = ">=3.10"
 coverage = { extras = ["toml"], version = ">=7.3.1" }
-mypy = ">=1.5.0"
+mypy = ">=1.6.0"
 pre-commit = ">=3.3.1"
 pytest = ">=7.4.2"
 pytest-cov = ">=4.1.0"

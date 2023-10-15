@@ -1,3 +1,4 @@
+"""Tests to check that the project is properly baked."""
 import datetime
 import importlib
 import os
@@ -8,19 +9,24 @@ from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
-import tomli
 from click.testing import CliRunner as ClickCliRunner
 from cookiecutter.utils import rmtree
 from typer.testing import CliRunner as TyperCliRunner
 
-# TODO Implement invoke ("poetry run invoke format --check", "poetry run invoke lint", "poetry run invoke docs --no-launch", "poetry run invoke test"), as in https://github.com/briggySmalls/cookiecutter-pypackage
+if sys.version_info < (3, 11):
+    from tomli import load as toml_load
+else:
+    from tomllib import load as toml_load
+
+INTERFACES = ["No command-line interface", "Click", "Typer", "Argparse"]
 
 
 @contextmanager
 def inside_dir(dirpath):
     """Execute code from inside the given directory.
 
-    :param dirpath: String, path of the directory the command is being run.
+    dirpath: str
+        Path of the directory the command is being run.
     """
     old_path = Path.cwd()
     try:
@@ -34,7 +40,7 @@ def inside_dir(dirpath):
 def bake_in_temp_dir(cookies, *args, **kwargs):
     """Delete the temporal directory that is created when executing the tests.
 
-    :param cookies: pytest_cookies.Cookies,
+    cookies: pytest_cookies.Cookies,
         cookie to be baked and its temporal files will be removed
     """
     result = cookies.bake(*args, **kwargs)
@@ -47,8 +53,10 @@ def bake_in_temp_dir(cookies, *args, **kwargs):
 def run_inside_dir(command, dirpath):
     """Run a command from inside a given directory, returning the exit status.
 
-    :param command: Command that will be executed
-    :param dirpath: String, path of the directory the command is being run.
+    command:
+        Command that will be executed
+    dirpath:
+        String, path of the directory the command is being run.
     """
     with inside_dir(dirpath):
         return subprocess.check_call(shlex.split(command))
@@ -61,6 +69,7 @@ def check_output_inside_dir(command, dirpath):
 
 
 def test_year_compute_in_license_file(cookies):
+    """Test the year in the license file."""
     with bake_in_temp_dir(cookies) as result:
         license_file_path = result.project.join("LICENSE")
         now = datetime.datetime.now()
@@ -76,6 +85,7 @@ def project_info(result):
 
 
 def test_bake_with_defaults(cookies):
+    """Test the default structure and configuration of the baked project."""
     with bake_in_temp_dir(cookies) as result:
         assert result.project.isdir()
         assert result.exit_code == 0
@@ -83,7 +93,7 @@ def test_bake_with_defaults(cookies):
 
         found_toplevel_files = [f.basename for f in result.project.listdir()]
         assert "pyproject.toml" in found_toplevel_files
-        # assert "python_boilerplate" in found_toplevel_files
+        assert "src" in found_toplevel_files
         assert "tox.ini" in found_toplevel_files
         assert "tests" in found_toplevel_files
 
@@ -91,9 +101,14 @@ def test_bake_with_defaults(cookies):
 
 
 def test_bake_and_run_tests(cookies):
-    with bake_in_temp_dir(cookies) as result:
+    """Test the baked project by running pytest inside its directory."""
+    with bake_in_temp_dir(cookies, extra_context={"use_pytest": "y"}) as result:
         assert result.project.isdir()
-        run_inside_dir("poetry run pytest", str(result.project)) == 0
+        test_file_path = result.project.join("tests/test_python_boilerplate.py")
+        lines = test_file_path.readlines()
+        assert "import pytest" in "".join(lines)
+        # Test the new pytest target
+        assert run_inside_dir("poetry run pytest", str(result.project)) == 0
         print("test_bake_and_run_tests path", str(result.project))
 
 
@@ -101,17 +116,18 @@ def test_bake_withspecialchars_and_run_tests(cookies):
     """Ensure that a `full_name` with double quotes does not break pyproject.toml."""
     with bake_in_temp_dir(cookies, extra_context={"full_name": 'name "quote" name'}) as result:
         assert result.project.isdir()
-        run_inside_dir("poetry run pytest", str(result.project)) == 0
+        assert run_inside_dir("poetry run pytest", str(result.project)) == 0
 
 
 def test_bake_with_apostrophe_and_run_tests(cookies):
     """Ensure that a `full_name` with apostrophes does not break pyproject.toml."""
     with bake_in_temp_dir(cookies, extra_context={"full_name": "O'connor"}) as result:
         assert result.project.isdir()
-        run_inside_dir("poetry run pytest", str(result.project)) == 0
+        assert run_inside_dir("poetry run pytest", str(result.project)) == 0
 
 
 def test_bake_without_author_file(cookies):
+    """Ensure that the authors files are removed."""
     with bake_in_temp_dir(cookies, extra_context={"create_author_file": "n"}) as result:
         found_toplevel_files = [f.basename for f in result.project.listdir()]
         assert "AUTHORS.md" not in found_toplevel_files
@@ -124,15 +140,8 @@ def test_bake_without_author_file(cookies):
         #     assert "contributing\n   history" in index_file.read()
 
 
-def test_make_help(cookies):
-    with bake_in_temp_dir(cookies) as result:
-        # The supplied Makefile does not support win32
-        if sys.platform != "win32":
-            output = check_output_inside_dir("make help", str(result.project))
-            assert b"check code coverage quickly with the default Python" in output
-
-
 def test_bake_selecting_license(cookies):
+    """Assert that the license is properly set."""
     license_strings = {
         "MIT": "MIT License",
         "BSD-3-Clause": "Redistributions of source code must retain the "
@@ -144,14 +153,20 @@ def test_bake_selecting_license(cookies):
     for license_name, target_string in license_strings.items():
         context = {"open_source_license": license_name}
         with bake_in_temp_dir(cookies, extra_context=context) as result:
-            # with bake_in_temp_dir(
-            #     cookies, extra_context={"open_source_license": license_name}
-            # ) as result:
-            assert target_string in result.project.join("LICENSE").read()
-            assert license_name in result.project.join("pyproject.toml").read()
+            # NOTE Path.open won't work properly for python<3.11
+            with open(result.project.join("LICENSE"), encoding="utf-8") as f:
+                content = f.read()
+                assert target_string in content
+            with open(result.project.join("pyproject.toml"), encoding="utf-8") as f:
+                content = f.read()
+                assert license_name in content
+            # NOTE the lines below can induce encoding errors
+            # assert target_string in result.project.join("LICENSE").read()
+            # assert license_name in result.project.join("pyproject.toml").read()
 
 
 def test_bake_not_open_source(cookies):
+    """Ensure that license is removed for not open source projects."""
     with bake_in_temp_dir(
         cookies, extra_context={"open_source_license": "Not open source"}
     ) as result:
@@ -161,19 +176,9 @@ def test_bake_not_open_source(cookies):
         assert "License" not in result.project.join("README.md").read()
 
 
-def test_using_pytest(cookies):
-    with bake_in_temp_dir(cookies, extra_context={"use_pytest": "y"}) as result:
-        assert result.project.isdir()
-        test_file_path = result.project.join("tests/test_python_boilerplate.py")
-        lines = test_file_path.readlines()
-        assert "import pytest" in "".join(lines)
-        # Test the new pytest target
-        run_inside_dir("pytest", str(result.project)) == 0
-
-
 def test_not_using_pytest(cookies):
-    context = {"use_pytest": "n"}
-    with bake_in_temp_dir(cookies, extra_context=context) as result:
+    """Ensure that pytest is not used when 'use_pytest' == 'n'."""
+    with bake_in_temp_dir(cookies, extra_context={"use_pytest": "n"}) as result:
         assert result.project.isdir()
         test_file_path = result.project.join("tests/test_python_boilerplate.py")
         lines = test_file_path.readlines()
@@ -181,67 +186,40 @@ def test_not_using_pytest(cookies):
         assert "import pytest" not in "".join(lines)
 
 
-def test_bake_with_no_console_script(cookies):
-    context = {"command_line_interface": "No command-line interface"}
+@pytest.mark.parametrize("interface", INTERFACES)
+def test_bake_with_console_script_files(cookies, interface):
+    """Ensure that the cli is properly set."""
+    context = {"command_line_interface": interface}
     result = cookies.bake(extra_context=context)
     project_path, project_slug, project_dir = project_info(result)
     found_project_files = os.listdir(project_dir)
-    assert "cli.py" not in found_project_files
 
-    pyproject_path = os.path.join(project_path, "pyproject.toml")
-    with open(pyproject_path, "r") as pyproject_file:
-        assert "[tool.poetry.scripts]" not in pyproject_file.read()
+    pyproject_path = Path(project_path) / "pyproject.toml"
+    with open(pyproject_path, encoding="utf-8") as pyproject_file:
+        file_content = pyproject_file.read()
 
-
-def test_bake_with_console_script_files(cookies):
-    context = {"command_line_interface": "Click"}
-    result = cookies.bake(extra_context=context)
-    project_path, project_slug, project_dir = project_info(result)
-    found_project_files = os.listdir(project_dir)
-    assert "cli.py" in found_project_files
-
-    pyproject_path = os.path.join(project_path, "pyproject.toml")
-    with open(pyproject_path, "r") as pyproject_file:
-        assert "[tool.poetry.scripts]" in pyproject_file.read()
-
-
-def test_bake_with_typer_console_script_files(cookies):
-    context = {"command_line_interface": "Typer"}
-    result = cookies.bake(extra_context=context)
-    project_path, project_slug, project_dir = project_info(result)
-    found_project_files = os.listdir(project_dir)
-    assert "cli.py" in found_project_files
-
-    pyproject_path = os.path.join(project_path, "pyproject.toml")
-    with open(pyproject_path, "r") as pyproject_file:
-        assert "[tool.poetry.scripts]" in pyproject_file.read()
-
-
-def test_bake_with_argparse_console_script_files(cookies):
-    context = {"command_line_interface": "Argparse"}
-    result = cookies.bake(extra_context=context)
-    project_path, project_slug, project_dir = project_info(result)
-    found_project_files = os.listdir(project_dir)
-    assert "cli.py" in found_project_files
-
-    pyproject_path = os.path.join(project_path, "pyproject.toml")
-    with open(pyproject_path, "r") as pyproject_file:
-        assert "[tool.poetry.scripts]" in pyproject_file.read()
+    if interface == "No command-line interface":
+        assert "cli.py" not in found_project_files
+        assert "[tool.poetry.scripts]" not in file_content
+    else:
+        assert "cli.py" in found_project_files
+        assert "[tool.poetry.scripts]" in file_content
 
 
 def test_bake_with_console_script_cli(cookies):
+    """Test the baked project's command line interface using Click."""
     context = {"command_line_interface": "Click"}
     result = cookies.bake(extra_context=context)
     project_path, project_slug, project_dir = project_info(result)
-    module_path = os.path.join(project_dir, "cli.py")
-    module_name = ".".join([project_slug, "cli"])
+    module_path = Path(project_dir) / "cli.py"
+    module_name = f"{project_slug}.cli"
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     cli = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(cli)
     runner = ClickCliRunner()
     noarg_result = runner.invoke(cli.main)
     assert noarg_result.exit_code == 0
-    noarg_output = " ".join(["Replace this message by putting your code into", project_slug])
+    noarg_output = f"Replace this message by putting your code into {project_slug}.cli.main"
     assert noarg_output in noarg_result.output
     help_result = runner.invoke(cli.main, ["--help"])
     assert help_result.exit_code == 0
@@ -249,26 +227,30 @@ def test_bake_with_console_script_cli(cookies):
 
 
 def test_bake_with_typer_console_script_cli(cookies):
+    """Test the baked project's command line interface using Typer."""
     context = {"command_line_interface": "Typer"}
     result = cookies.bake(extra_context=context)
     project_path, project_slug, project_dir = project_info(result)
-    module_path = os.path.join(project_dir, "cli.py")
-    module_name = ".".join([project_slug, "cli"])
+    module_path = Path(project_dir) / "cli.py"
+    module_name = f"{project_slug}.cli"
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     cli = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(cli)
     runner = TyperCliRunner()
-    noarg_result = runner.invoke(cli.app)  # Change 'main' to 'app' for Typer
+    noarg_result = runner.invoke(cli.app)
     assert noarg_result.exit_code == 0
-    noarg_output = " ".join(["Replace this message by putting your code into", project_slug])
+    noarg_output = f"Replace this message by putting your code into {project_slug}.cli.main"
     assert noarg_output in noarg_result.output
-    help_result = runner.invoke(cli.app, ["--help"])  # Change 'main' to 'app' for Typer
+    help_result = runner.invoke(cli.app, ["--help"])
     assert help_result.exit_code == 0
     assert "Show this message" in help_result.output
 
 
-# FIXME This test doesn't work: "FAILED tests/test_bake_project.py::test_bake_with_argparse_console_script_cli - AttributeError: 'function' object has no attribute 'name'"
+# FIXME This test doesn't work:
+# FAILED tests/test_bake_project.py::test_bake_with_argparse_console_script_cli
+# AttributeError: 'function' object has no attribute 'name'"
 # def test_bake_with_argparse_console_script_cli(cookies):
+#     """Test the baked project's command line interface using argparse."""
 #     context = {"command_line_interface": "Argparse"}
 #     result = cookies.bake(extra_context=context)
 #     project_path, project_slug, project_dir = project_info(result)
@@ -288,18 +270,18 @@ def test_bake_with_typer_console_script_cli(cookies):
 
 
 @pytest.mark.parametrize(
-    "formatter,expected", [("Black", "black --check"), ("Ruff-format", "ruff"), ("No", None)]
+    ("formatter", "expected"), [("Black", "black --check"), ("Ruff-format", "ruff"), ("No", None)]
 )
 def test_formatter(cookies, formatter, expected):
+    """Ensure that the chosen formater is properly set."""
     formatter_to_dependency = {"Black": "black", "Ruff-format": "ruff", "No": None}
 
     with bake_in_temp_dir(cookies, extra_context={"formatter": formatter}) as result:
         assert result.project.isdir()
         pyproject_path = result.project.join("pyproject.toml")
-        with Path.open(pyproject_path, "rb") as f:
-            pyproject_content = tomli.load(f)
+        with open(pyproject_path, "rb") as f:
+            pyproject_content = toml_load(f)
 
-        # FIXME This assert will fail for ruff-format, as the dependency is "ruff", not "ruff-format"
         dependency = formatter_to_dependency[formatter]
         assert (
             dependency in pyproject_content["tool"]["poetry"]["group"]["dev"]["dependencies"]
@@ -311,3 +293,18 @@ def test_formatter(cookies, formatter, expected):
         else:
             assert "black --check" not in tasks_content
             assert "ruff format" not in tasks_content
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        "poetry run invoke lint",
+        "poetry run invoke docs --no-launch",
+    ],
+)
+def test_bake_and_run_and_invoke(cookies, command):
+    """Run the unit tests of a newly-generated project using invoke's tasks."""
+    with bake_in_temp_dir(cookies) as result:
+        assert result.project.isdir()
+        return_code = run_inside_dir(command, str(result.project))
+        assert return_code == 0, f"'{command}' failed with return code {return_code}"
