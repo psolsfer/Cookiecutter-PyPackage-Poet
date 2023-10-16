@@ -6,6 +6,7 @@
 import argparse
 {% endif -%}
 {% if cookiecutter.use_pytest == "y" -%}
+
 import pytest
 {% else -%}
 import unittest
