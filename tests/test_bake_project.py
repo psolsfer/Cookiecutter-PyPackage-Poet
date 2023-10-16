@@ -7,6 +7,7 @@ import subprocess
 import sys
 from contextlib import contextmanager
 from pathlib import Path
+from unittest import mock
 
 import pytest
 from click.testing import CliRunner as ClickCliRunner
@@ -246,27 +247,35 @@ def test_bake_with_typer_console_script_cli(cookies):
     assert "Show this message" in help_result.output
 
 
-# FIXME This test doesn't work:
-# FAILED tests/test_bake_project.py::test_bake_with_argparse_console_script_cli
-# AttributeError: 'function' object has no attribute 'name'"
-# def test_bake_with_argparse_console_script_cli(cookies):
-#     """Test the baked project's command line interface using argparse."""
-#     context = {"command_line_interface": "Argparse"}
-#     result = cookies.bake(extra_context=context)
-#     project_path, project_slug, project_dir = project_info(result)
-#     module_path = os.path.join(project_dir, "cli.py")
-#     module_name = ".".join([project_slug, "cli"])
-#     spec = importlib.util.spec_from_file_location(module_name, module_path)
-#     cli = importlib.util.module_from_spec(spec)
-#     spec.loader.exec_module(cli)
-#     runner = ClickCliRunner()
-#     noarg_result = runner.invoke(cli.main)
-#     assert noarg_result.exit_code == 0
-#     noarg_output = " ".join(["Replace this message by putting your code into", project_slug])
-#     assert noarg_output in noarg_result.output
-#     help_result = runner.invoke(cli.main, ["--help"])
-#     assert help_result.exit_code == 0
-#     assert "Show this message" in help_result.output
+def test_bake_with_argparse_console_script_cli(cookies, capsys):
+    """Test the baked project's command line interface using argparse."""
+    context = {"command_line_interface": "Argparse"}
+    result = cookies.bake(extra_context=context)
+    project_path, project_slug, project_dir = project_info(result)
+    module_path = os.path.join(project_dir, "cli.py")
+    module_name = f"{project_slug}.cli"
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    cli = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(cli)
+
+    with mock.patch("argparse._sys.argv", ["cli"]):
+        noarg_result = cli.main()
+        assert noarg_result == 0
+        out, err = capsys.readouterr()
+        noarg_output = f"Replace this message by putting your code into {project_slug}"
+        assert noarg_output in out
+
+    # Mock the command line arguments for --help
+    with mock.patch("argparse._sys.argv", ["cli", "--help"]):
+        try:
+            help_result = cli.main()
+        except SystemExit as e:
+            help_result = e.code
+
+        assert help_result == 0
+
+        out, err = capsys.readouterr()
+        assert "show this help message" in out
 
 
 @pytest.mark.parametrize(
