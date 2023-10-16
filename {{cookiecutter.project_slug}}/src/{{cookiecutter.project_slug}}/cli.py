@@ -11,7 +11,7 @@ import click
 import typer
 {%- endif %}
 
-{% if cookiecutter.command_line_interface|lower == 'click' %}
+{%- if cookiecutter.command_line_interface|lower == 'click' %}
 @click.command()
 def main(args=None):
     """Console script for {{cookiecutter.project_slug}}."""

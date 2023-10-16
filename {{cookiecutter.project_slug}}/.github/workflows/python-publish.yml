@@ -48,7 +48,7 @@ jobs:
     - name: Build package
       run: |
           poetry build
-          {% endraw %}{%- if cookiecutter.private_package_repository_name %}{% raw %}
+          {% endraw %}{%- if cookiecutter.private_package_repository_name -%}{% raw %}
     - name: Publish package
       run: |
         poetry config repositories.private "{% endraw %}{{ cookiecutter.private_package_repository_url.replace('simple/', '').replace('simple', '') }}{% raw %}"

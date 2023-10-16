@@ -4,17 +4,17 @@
 
 {% set license = cookiecutter.open_source_license -%}
 {% set is_open_source = cookiecutter.open_source_license != "Not open source" -%}
-{% if "read" in cookiecutter.docs|lower %}
-    {% set docs = "read" %}
-{% elif "github" in cookiecutter.docs|lower %}
-    {% set docs = "git" %}
-{% else %}
-    {% set docs = "no" %}
-{% endif %}
-{% if is_open_source %}
+{% if "read" in cookiecutter.docs|lower -%}
+    {% set docs = "read" -%}
+{% elif "github" in cookiecutter.docs|lower -%}
+    {% set docs = "git" -%}
+{% else -%}
+    {% set docs = "no" -%}
+{% endif -%}
+{% if is_open_source -%}
 | | |
 | --- | --- |
-{%- if docs != "no" %}
+{%- if docs != "no" -%}
 | **Docs** |{%- if docs == "read" %} [![Documentation Status](<https://readthedocs.org/projects/{{ cookiecutter.project_slug }}/badge/?version=latest> 'Documentation Status')](<https://{{ cookiecutter.project_slug | replace("_", "-") }}.readthedocs.io/en/latest/>){%- elif docs == "git" %} [![Documentation Status](<https://{{ cookiecutter.github_username }}.github.io/{{ cookiecutter.project_slug }}/> 'Documentation Status')](<https://{{ cookiecutter.github_username }}.github.io/{{ cookiecutter.project_slug }}/>){%- endif %} |{%- endif %}
 {%- if not cookiecutter.private_package_repository_name %}
 | **Package** | [![PyPI - Version](<https://img.shields.io/pypi/v/{{ cookiecutter.project_slug }}.svg?logo=pypi&label=PyPI&logoColor=gold>)](<https://pypi.python.org/pypi/{{ cookiecutter.project_slug }}>) [![PyPI - Downloads](<https://img.shields.io/pypi/dm/{{ cookiecutter.project_slug }}.svg?color=blue&label=Downloads&logo=pypi&logoColor=gold>)](<https://pypi.python.org/pypi/{{ cookiecutter.project_slug }}>) [![PyPI - Python Version](<https://img.shields.io/pypi/pyversions/{{ cookiecutter.project_slug }}.svg?logo=python&label=Python&logoColor=gold>)](<https://pypi.python.org/pypi/{{ cookiecutter.project_slug }}>) |{%- endif %}

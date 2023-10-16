@@ -60,7 +60,7 @@ def format_black(c:Context, check=True, ignore_failure: bool = False)->None:
     """Check style with black."""
     check_str = "--check" if check else ""
     _run(c, "black --check {} {}".format(check_str, " ".join(PYTHON_DIRS)), ignore_failure)
-{% elif cookiecutter.formatter|lower == 'ruff-format' %}
+{%- elif cookiecutter.formatter|lower == 'ruff-format' %}
 
 
 @task(help={"check": "Only checks without making changes (bool)"})
@@ -68,7 +68,7 @@ def format_ruff(c: Context, check: bool = True, ignore_failure: bool = False) ->
     """Check style with Ruff Formatter."""
     check_str = "--check" if check else ""
     _run(c, "ruff format {} {}".format(check_str, " ".join(PYTHON_DIRS)), ignore_failure)
-{% endif %}
+{%- endif %}
 
 
 @task(help={"check": "Only checks, without making changes"})
@@ -77,9 +77,9 @@ def lint(c:Context, check:bool=True)->None:
     lint_ruff(c, check, True)
     {%- if cookiecutter.formatter|lower == 'black' %}
     format_black(c, check, True)
-    {% elif cookiecutter.formatter|lower == 'ruff-format' %}
+    {%- elif cookiecutter.formatter|lower == 'ruff-format' %}
     format_ruff(c, check, True)
-    {% endif %}
+    {%- endif %}
     type_check(c, True)
 
 
@@ -207,7 +207,6 @@ def clean_docs(c:Context)->None:
 @task(pre=[clean_build, clean_python, clean_tests, clean_docs])
 def clean(c:Context)->None:
     """Run all clean sub-tasks."""
-
 
 
 # Build and release

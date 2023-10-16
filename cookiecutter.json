@@ -47,7 +47,8 @@
         "Not open source"
     ],
     "_copy_without_render": [
-        "*.github/*.yml",
+        "*.github/dependabot.yml",
+        "*.github/release-drafter.yml",
         "*.github/workflows/release-drafter.yml",
         "*.github/workflows/test-push-pr.yml",
         "docs/authors.md",
