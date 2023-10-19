@@ -1,3 +1,9 @@
+## v0.1.2 (2023-10-19)
+
+### Fix
+
+- **mkdocs.yml**: resolve mkdocs-material warning for emoji logic
+
 ## v0.1.1 (2023-10-06)
 
 ### Fix
