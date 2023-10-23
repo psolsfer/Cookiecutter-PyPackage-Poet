@@ -38,7 +38,7 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
 ]
 packages = [
-    { include = "{{ cookiecutter.project_slug }}", from = "src"},
+    { include = "{{ cookiecutter.project_slug }}", from = "src" },
     { include = "tests", format = "sdist" },
 ]
 include = [
@@ -48,6 +48,7 @@ include = [
     "CONTRIBUTING.md",
     "HISTORY.md",
     "LICENSE",
+    "py.typed",
     "README.md",
     "tests/**/*",
     "docs/**/*.{md,py,jpg,png,gif}",
@@ -187,7 +188,7 @@ show_error_codes = true
 show_error_context = true
 warn_unreachable = true
 
-{%- if cookiecutter.development_environment == "strict" and cookiecutter.with_pydantic_typing == "y" %}
+{% if cookiecutter.development_environment == "strict" and cookiecutter.with_pydantic_typing == "y" %}
 [tool.pydantic-mypy]  # https://pydantic-docs.helpmanual.io/mypy_plugin/#configuring-the-plugin
 init_forbid_extra = true
 init_typed = true
@@ -195,7 +196,7 @@ warn_required_dynamic_aliases = true
 warn_untyped_fields = true
 {%- endif %}
 
-{%- if cookiecutter.use_pytest == 'y' %}
+{% if cookiecutter.use_pytest == 'y' %}
 [tool.coverage.report]  # https://coverage.readthedocs.io/en/latest/config.html#report
 {%- if cookiecutter.development_environment == "strict" %}
 fail_under = 0 # Set the desired threshold for the coverage report to fail
@@ -240,7 +241,7 @@ target-version = "py{{ cookiecutter.python_version.split('.')[:2]|join }}"
 [tool.ruff.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-{%- if cookiecutter.development_environment == "strict" %}
+{% if cookiecutter.development_environment == "strict" %}
 [tool.ruff.pycodestyle]
 max-doc-length = 100
 {%- endif %}
