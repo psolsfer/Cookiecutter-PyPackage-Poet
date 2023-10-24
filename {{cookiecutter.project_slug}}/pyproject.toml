@@ -166,12 +166,6 @@ name = "{{ cookiecutter.private_package_repository_name|slugify }}"
 url = "{{ cookiecutter.private_package_repository_url }}"
 {%- endif %}
 
-{%- if cookiecutter.formatter|lower == 'black' %}
-[tool.black]  # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
-line-length = 100
-target-version = ["py{{ cookiecutter.python_version.split('.')[:2]|join }}"]
-{%- endif %}
-
 [tool.mypy]  # https://mypy.readthedocs.io/en/latest/config_file.html
 {%- if cookiecutter.with_pydantic_typing == "y" %}
 plugins = "pydantic.mypy"
@@ -248,3 +242,12 @@ max-doc-length = 100
 
 [tool.ruff.pydocstyle]
 convention = "{{ cookiecutter.docstring_style|lower }}"
+
+{% if cookiecutter.formatter|lower == 'ruff-format' %}
+[tool.ruff.format]
+line-ending = "auto"
+{% elif cookiecutter.formatter|lower == 'black' %}
+[tool.black]  # https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html#configuration-via-a-file
+line-length = 100
+target-version = ["py{{ cookiecutter.python_version.split('.')[:2]|join }}"]
+{% endif %}

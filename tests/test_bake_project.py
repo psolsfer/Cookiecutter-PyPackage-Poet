@@ -1,11 +1,11 @@
 """Tests to check that the project is properly baked."""
-import datetime
 import importlib
 import os
 import shlex
 import subprocess
 import sys
 from contextlib import contextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest import mock
 
@@ -73,7 +73,7 @@ def test_year_compute_in_license_file(cookies):
     """Test the year in the license file."""
     with bake_in_temp_dir(cookies) as result:
         license_file_path = result.project.join("LICENSE")
-        now = datetime.datetime.now()
+        now = datetime.now(tz=timezone.utc).astimezone()
         assert str(now.year) in license_file_path.read()
 
 
@@ -155,10 +155,10 @@ def test_bake_selecting_license(cookies):
         context = {"open_source_license": license_name}
         with bake_in_temp_dir(cookies, extra_context=context) as result:
             # NOTE Path.open won't work properly for python<3.11
-            with open(result.project.join("LICENSE"), encoding="utf-8") as f:
+            with Path.open(result.project.join("LICENSE"), encoding="utf-8") as f:
                 content = f.read()
                 assert target_string in content
-            with open(result.project.join("pyproject.toml"), encoding="utf-8") as f:
+            with Path.open(result.project.join("pyproject.toml"), encoding="utf-8") as f:
                 content = f.read()
                 assert license_name in content
             # NOTE the lines below can induce encoding errors
@@ -196,7 +196,7 @@ def test_bake_with_console_script_files(cookies, interface):
     found_project_files = os.listdir(project_dir)
 
     pyproject_path = Path(project_path) / "pyproject.toml"
-    with open(pyproject_path, encoding="utf-8") as pyproject_file:
+    with Path.open(pyproject_path, encoding="utf-8") as pyproject_file:
         file_content = pyproject_file.read()
 
     if interface == "No command-line interface":
@@ -252,7 +252,7 @@ def test_bake_with_argparse_console_script_cli(cookies, capsys):
     context = {"command_line_interface": "Argparse"}
     result = cookies.bake(extra_context=context)
     project_path, project_slug, project_dir = project_info(result)
-    module_path = os.path.join(project_dir, "cli.py")
+    module_path = project_dir / "cli.py"
     module_name = f"{project_slug}.cli"
     spec = importlib.util.spec_from_file_location(module_name, module_path)
     cli = importlib.util.module_from_spec(spec)
@@ -288,7 +288,7 @@ def test_formatter(cookies, formatter, expected):
     with bake_in_temp_dir(cookies, extra_context={"formatter": formatter}) as result:
         assert result.project.isdir()
         pyproject_path = result.project.join("pyproject.toml")
-        with open(pyproject_path, "rb") as f:
+        with Path.open(pyproject_path, "rb") as f:
             pyproject_content = toml_load(f)
 
         dependency = formatter_to_dependency[formatter]
