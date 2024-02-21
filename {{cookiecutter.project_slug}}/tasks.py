@@ -246,21 +246,25 @@ def pre_commit_install(c: Context) -> None:
 def install(c: Context) -> None:
     """Install the package and the pre-commit hooks."""
 
+# pipx
+
+@task
+def install_pipx(c: Context) -> None:
+    """Download and install pipx."""
+    if os.name == "nt":  # Windows
+        c.run("py -m pip install pipx")
+    else:  # Unix/Linux/MacOS
+        c.run("python3 -m pip install pipx")
+
 
 # Poetry
 @task
 def install_poetry(c: Context) -> None:
-    """Download and install Poetry."""
-    if os.name == 'nt':  # Windows
-        c.run("(Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | py -")
-    else:  # Unix/Linux/MacOS
-        c.run("curl -sSL https://install.python-poetry.org | python3 -")
+    """Download and install Poetry using pipx."""
+    c.run("pipx install poetry")
 
 
 @task
 def remove_poetry(c: Context) -> None:
-    """Uninstall Poetry."""
-    if os.name == 'nt':  # Windows
-        c.run("(Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py -UseBasicParsing).Content | py - --uninstall")
-    else:  # Unix/Linux/MacOS
-        c.run("curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/install-poetry.py | python3 - --uninstall")
+    """Uninstall Poetry using pipx."""
+    c.run("pipx uninstall poetry")

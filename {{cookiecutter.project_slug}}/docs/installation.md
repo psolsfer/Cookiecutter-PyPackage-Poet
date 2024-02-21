@@ -53,4 +53,8 @@ poetry install
 This command installs all dependencies as specified in `pyproject.toml` and also creates a virtual environment if one doesn't exist.
 
 [Github repo]: <https://github.com/{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug }}>
+[pip]: https://pip.pypa.io/
+[Poetry]: https://python-poetry.org/
+[Poetry installation]: https://python-poetry.org/docs/#installation
+[Python installation guide]: http://docs.python-guide.org/en/latest/starting/installation/
 [tarball]: <https://github.com/{{ cookiecutter.github_username }}/{{ cookiecutter.project_slug }}/tarball/main/>
