@@ -53,14 +53,10 @@ cookiecutter = ">=2.3"
 cruft = ">=2.15.0"
 
 [tool.poetry.group.dev.dependencies]  # https://python-poetry.org/docs/master/managing-dependencies/
-pip = ">=23"
+commitizen = ">=3.10"
 cookiecutter = ">=2.3"
 cruft = ">=2.15.0"
 invoke = ">=2.2"
-wheel = ">=0.41.2"
-watchdog = ">=3.0.0"
-tox = ">=4.11"
-tox-gh-actions = "^3"
 mkdocs = ">=1.5.3"
 mkdocstrings = { extras = ["python"], version = ">=0.23.0" }
 mkdocs-material = ">=9.4.2"
@@ -68,14 +64,18 @@ mkdocs-material-extensions = ">=1.2"
 mkdocs-include-markdown-plugin = ">=6.0"
 mkdocs-awesome-pages-plugin = ">=2.9.2"
 mypy = ">=1.6.0"
+pip = ">=23"
 pytest = ">=7.4.2"
 pytest-cookies = ">=0.7.0"
 coverage = ">=7.3.1"
 pre-commit = ">=3.3.1"
-ruff = ">=2"
+ruff = ">=0.3"
 safety = ">=2.3.4, !=2.3.5"
+tox = ">=4.11"
+tox-gh-actions = "^3"
 typeguard = ">=4.1.5"
-commitizen = ">=3.10"
+wheel = ">=0.41.2"
+watchdog = ">=3.0.0"
 
 [tool.poetry.group.test.dependencies]  # https://python-poetry.org/docs/master/managing-dependencies/
 commitizen = ">=3.10"
@@ -87,7 +87,7 @@ pytest-cookies = ">=0.7.0"
 pytest-clarity = ">=1.0.1"
 pytest-mock = ">=3.10.0"
 pytest-xdist = ">=3.3.1"
-ruff = ">=2"
+ruff = ">=0.3"
 safety = ">=2.3.4, !=2.3.5"
 tomli = {version = "^2", markers = "python_version<'3.11'"}
 typeguard = ">=4.1.5"
@@ -147,20 +147,22 @@ xfail_strict = true
 
 [tool.ruff]  # https://github.com/charliermarsh/ruff
 fix = true
-ignore-init-module-imports = true
 line-length = 100
-select = ["A", "ASYNC", "B", "BLE", "C4", "C90", "D", "DTZ", "E", "EM", "ERA", "F", "FLY", "G", "I", "ICN", "INP", "ISC", "N", "NPY", "PGH", "PIE", "PLC", "PLE", "PLR", "PLW", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "S", "SIM", "SLF", "T10", "T20", "TCH", "TID", "TRY", "UP", "W", "YTT"]
-ignore = ["E501", "PGH001", "RET504", "S101"]
-unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
 target-version = "py310"
 
-[tool.ruff.flake8-tidy-imports]
+[tool.ruff.lint]
+ignore-init-module-imports = true
+ignore = ["E501", "ISC001", "RET504", "S101"]
+select = ["A", "ASYNC", "B", "BLE", "C4", "C90", "D", "DTZ", "E", "EM", "ERA", "F", "FLY", "G", "I", "ICN", "INP", "ISC", "N", "NPY", "PGH", "PIE", "PLC", "PLE", "PLR", "PLW", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "S", "SIM", "SLF", "T10", "T20", "TCH", "TID", "TRY", "UP", "W", "YTT"]
+unfixable = ["ERA001", "F401", "F841", "T201", "T203"]
+
+[tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-[tool.ruff.pycodestyle]
+[tool.ruff.lint.pycodestyle]
 max-doc-length = 100
 
-[tool.ruff.pydocstyle]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
 [tool.ruff.format]
