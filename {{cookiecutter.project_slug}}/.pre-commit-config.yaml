@@ -67,11 +67,11 @@ repos:
         types: [python]
       {%- elif cookiecutter.formatter|lower == 'ruff-format' %}
       - id: ruff-format
-      name: ruff-format
-      entry: poetry run ruff format
-      require_serial: true
-      language: system
-      types: [python, pyi, jupyter] # ??? Does ruff-format works for jupyter files?
+        name: ruff-format
+        entry: poetry run ruff format
+        require_serial: true
+        language: system
+        types: [python, pyi, jupyter] # ??? Does ruff-format works for jupyter files?
       {%- endif %}
       - id: poetry-check
         name: poetry check
