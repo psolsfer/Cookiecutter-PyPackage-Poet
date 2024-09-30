@@ -3,7 +3,7 @@
 # to "_copy_without_render" in cookiecutter.json
 nav:
     - Home:
-          - About: index.md
+          - index.md
           - Getting started:
                 - Installation: installation.md
                 - Usage: usage.md

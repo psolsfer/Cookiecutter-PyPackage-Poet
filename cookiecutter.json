@@ -35,8 +35,8 @@
     ],
     "create_author_file": "y",
     "docstring_style": [
-        "NumPy",
-        "Google"
+        "numpy",
+        "google"
     ],
     "open_source_license": [
         "BSD-3-Clause",
