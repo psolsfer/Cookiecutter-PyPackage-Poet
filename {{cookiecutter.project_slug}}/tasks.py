@@ -4,6 +4,7 @@ Tasks for maintaining the {{ cookiecutter.project_name }} package.
 Execute 'invoke --list' for guidance on using Invoke
 """
 
+import logging
 import os
 import platform
 import shutil
@@ -14,6 +15,8 @@ from invoke.context import Context
 from invoke.exceptions import Failure
 from invoke.runners import Result
 from invoke.tasks import task
+
+logger = logging.getLogger(__name__)
 
 ROOT_DIR = Path(__file__).parent
 TEST_DIR = ROOT_DIR.joinpath("tests")
@@ -187,7 +190,7 @@ def clean_python(c: Context) -> None:
                 elif filename.is_dir():
                     shutil.rmtree(filename)
             except OSError as e:
-                print(f"Error: {filename} : {e.strerror}")
+                logger.warning("Failed to remove %s: %s", filename, e.strerror)
 
 
 @task
