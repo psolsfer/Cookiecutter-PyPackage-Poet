@@ -1,3 +1,14 @@
+## v0.2.1 (2025-01-22)
+
+### Fix
+
+- workflow fixed so publish to pypi uses trusted publishers
+- fix typo in test __init__
+
+### Refactor
+
+- **tasks**: replace print by logger
+
 ## v0.2.0 (2024-09-30)
 
 ### Feat

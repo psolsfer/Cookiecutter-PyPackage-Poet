@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "Cookiecutter-Pypackage-Poet"
-version = "0.2.0"
+version = "0.2.1"
 description = "Cookiecutter/Cruft template for a Python package managed with Poetry."
 authors = ["Pablo Solís-Fernández <psolsfer@gmail.com>"]
 readme = "README.md"
@@ -42,7 +42,7 @@ build-backend = "poetry.core.masonry.api"
 bump_message = "bump(release): v$current_version → v$new_version"
 tag_format = "v$version"
 update_changelog_on_bump = true
-version = "0.2.0"
+version = "0.2.1"
 version_files = [
     "pyproject.toml:version"
     ]
