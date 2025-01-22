@@ -1,4 +1,5 @@
 """Tests to check that the project is properly baked."""
+
 import importlib
 import os
 import shlex
@@ -72,9 +73,17 @@ def check_output_inside_dir(command, dirpath):
 def test_year_compute_in_license_file(cookies):
     """Test the year in the license file."""
     with bake_in_temp_dir(cookies) as result:
-        license_file_path = result.project.join("LICENSE")
-        now = datetime.now(tz=timezone.utc).astimezone()
-        assert str(now.year) in license_file_path.read()
+        if result.exception is not None:
+            pytest.fail(f"Cookie baking failed: {result.exception}")
+
+        license_path = Path(result.project) / "LICENSE"
+        if not license_path.exists():
+            pytest.fail("LICENSE file not found in the project directory")
+
+        current_year = str(datetime.now(tz=timezone.utc).astimezone().year)
+        assert (
+            current_year in license_path.read_text()
+        ), f"Year {current_year} not found in LICENSE file"
 
 
 def project_info(result):
